@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>滚动</title>
+    <style>
+      *{margin: 0;padding: 0;}
+      ul {list-style: none;}
+      #playImage {
+        position: relative;
+        width: 430px;
+        margin: 10px auto;
+        background: #ccc;
+      }
+
+      #bigList{width: 100%;position: relative; height:500px;z-index: 1;}
+      #bigList li {position: absolute;height: 100%;}
+      #bigList img {width: 100%;height: 100%;}
+
+      .prev {width: 50%;position: absolute;left: 0;top:0;bottom: 0;z-index: 2;}
+      .next {width: 50%;position: absolute;right: 0;top:0;bottom: 0;z-index: 2;}
+      .prev span {position: absolute;
+        width: 50px;
+        height: 50px;
+        border: 5px solid #fff;
+        border-width: 5px 0 0 5px;
+        transform: rotate(-45deg);
+        left: 30px;
+        top: 50%;
+        margin-top: -25px;
+        opacity: 0;
+      }
+      .next span {position: absolute;
+        width: 50px;
+        height: 50px;
+        border: 5px solid #fff;
+        border-width: 5px 5px 0 0;
+        transform: rotate(45deg);
+        right: 30px;
+        top: 50%;
+        margin-top: -25px;
+        opacity: 0;
+      }
+      .small {position: relative;background: #ccc;width: 430px;margin: 0 auto 100px;height: 185px;overflow: hidden;}
+      .small-list {position: relative;height: 170px;overflow: hidden;left: 10px;top:7px;}
+      .small-list ul {
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+      .small-list ul li {width: 130px;background: #ccc;text-align: center;float: left;opacity: .3;padding-right: 10px;}
+
+      .small-list ul li img{width: 100%;}
+    </style>
+
+  </head>
+  <body>
+    <div id="playImage">
+      <ul id="bigList">
+        <li><img src="images/1.jpg" /></li>
+        <li><img src="images/2.jpg" /></li>
+        <li><img src="images/3.jpg" /></li>
+        <li><img src="images/4.jpg" /></li>
+        <li><img src="images/5.jpg" /></li>
+        <li><img src="images/6.jpg" /></li>
+      </ul>
+        <a href="javascript:void(0)" class="prev"><span></span></a>
+        <a href="javascript:void(0)" class="next"><span></span></a>
+      <div class="bg"></div>
+    </div>
+    <div class="small">
+      <div class="small-list">
+        <ul id="smallList">
+          <li><img src="images/1.jpg" /></li>
+          <li><img src="images/2.jpg" /></li>
+          <li><img src="images/3.jpg" /></li>
+          <li><img src="images/4.jpg" /></li>
+          <li><img src="images/5.jpg" /></li>
+          <li><img src="images/6.jpg" /></li>
+        </ul>
+      </div>
+
+    </div>
+    <script src="move.js"></script>
+    <script>
+      window.onload = function(){
+        var oDiv = document.getElementById('playImage');
+        var oBigList = document.getElementById('bigList');
+        var aBigLi = oBigList.getElementsByTagName('li');
+        var oPrev = getByClass(oDiv,'prev')[0];
+        var oNext = getByClass(oDiv,'next')[0];
+        var oPrevBtn = oPrev.getElementsByTagName('span')[0];
+        var oNextBtn = oNext.getElementsByTagName('span')[0];
+        var oSmallList = document.getElementById('smallList');
+        var aSmallLi = oSmallList.getElementsByTagName('li');
+        var iNow = 0;
+        var iMinZindex = 2;
+
+        oSmallList.style.width = aSmallLi[0].offsetWidth * aSmallLi.length+'px';
+
+
+        oPrev.onmouseover = function() {
+          startMove(oPrevBtn,'opacity',100);
+        }
+        oPrev.onmouseout = function() {
+          startMove(oPrevBtn,'opacity',0);
+        }
+        oNext.onmouseover = function() {
+          startMove(oNextBtn,'opacity',100);
+        }
+        oNext.onmouseout = function() {
+          startMove(oNextBtn,'opacity',0);
+        }
+        for(var i=0; i<aSmallLi.length;i++){
+          aSmallLi[i].index = i;
+          aSmallLi[i].onmouseover = function(){
+            startMove(this,'opacity',100);
+          }
+          aSmallLi[i].onmouseout = function(){
+            if(this.index != iNow){
+              startMove(this,'opacity',30);
+            }
+
+          }
+          aSmallLi[i].onclick = function(){
+            if(this.index == iNow) return;
+            iNow = this.index;
+            tab();
+            // for(var i=0; i<aSmallLi.length;i++){
+            //   startMove(aSmallLi[i],'opacity',30);
+            // }
+            // startMove(this,'opacity',100);
+            // aBigLi[this.index].style.zIndex = iMinZindex++;
+            // aBigLi[this.index].style.height = 0;
+            //
+            // startMove(aBigLi[this.index],'height',oBigList.offsetHeight);
+            // if(iNow == 0) {
+            //   startMove(oSmallList,'left',0);
+            // }else if(iNow == aSmallLi.length-1) {
+            //   startMove(oSmallList,'left',-(iNow-2)*aSmallLi[0].offsetWidth);
+            // }else {
+            //   startMove(oSmallList,'left',-(iNow-1)*aSmallLi[0].offsetWidth);
+            // }
+
+
+          }
+        }
+
+
+        oPrevBtn.onclick = function() {
+          iNow--;
+          if(iNow < 0) {
+            iNow = aSmallLi.length-1;
+          }
+          tab();
+        }
+        oNextBtn.onclick = function() {
+          iNow++;
+          if(iNow > aSmallLi.length-1) {
+            iNow = 0;
+          }
+          tab();
+        }
+        function tab() {
+          for(var i=0; i<aSmallLi.length;i++){
+            startMove(aSmallLi[i],'opacity',30);
+          }
+          startMove(aSmallLi[iNow],'opacity',100);
+          aBigLi[iNow].style.zIndex = iMinZindex++;
+          aBigLi[iNow].style.height = 0;
+
+          startMove(aBigLi[iNow],'height',oBigList.offsetHeight);
+          if(iNow == 0) {
+            startMove(oSmallList,'left',0);
+          }else if(iNow == aSmallLi.length-1) {
+            startMove(oSmallList,'left',-(iNow-2)*aSmallLi[0].offsetWidth);
+          }else {
+            startMove(oSmallList,'left',-(iNow-1)*aSmallLi[0].offsetWidth);
+          }
+        }
+
+
+      }
+
+
+
+
+      function getByClass(aPar,sCls) {
+        var aEle = aPar.getElementsByTagName('*');
+        var aResult = [];
+        for (var i=0; i<aEle.length; i++) {
+          if(aEle[i].className == sCls) {
+            aResult.push(aEle[i]);
+          }
+        }
+        return aResult;
+      }
+
+
+
+    </script>
+  </body>
+</html>
